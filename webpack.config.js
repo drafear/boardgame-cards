@@ -1,8 +1,15 @@
 const path = require('path');
+const webpack = require('webpack');
+const dotenv = require('dotenv');
+
+const env = dotenv.config().parsed;
+
 module.exports = {
     entry: {
-        main: './src/app.ts',
-        css: './src/less/index.less',
+      index: './src/index.ts',
+      indexLess: './src/less/index.less',
+      cards: './src/cards.ts',
+      cardsLess: './src/less/cards.less',
     },
     output: {
         path: path.join(__dirname, 'dist'),
@@ -19,7 +26,8 @@ module.exports = {
     module: {
         rules: [
             {
-                test:/\.ts$/, loader:'ts-loader'
+                test: /\.ts$/,
+                loader: 'ts-loader',
             },
             {
               test: /\.less$/i,
@@ -30,6 +38,15 @@ module.exports = {
                 "less-loader",
               ],
             },
+            {
+              test: /\.bnf$/,
+              use: "./bnf-loader",
+            },
         ]
-    }
+    },
+    plugins: [
+      new webpack.DefinePlugin({
+        'process.env': JSON.stringify(env)
+      })
+    ],
 }
