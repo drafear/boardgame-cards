@@ -6,15 +6,15 @@ import { Literals } from "./literal";
 const LANGUAGE_BNF = `
 program        ::= lines;
 lines          ::= line ";" lines | line ;
-line           ::= "OR" | coron_stmt ;
-coron_stmt     ::= or_stmt ":" arrow_stmt | arrow_stmt ;
-arrow_stmt     ::= or_stmt? "→" or_stmt | or_stmt ;
+line           ::= "OR" | colon_stmt ;
+colon_stmt     ::= or_stmt ":" arrow_stmt | arrow_stmt ;
+arrow_stmt     ::= or_stmt? ">" or_stmt | or_stmt ;
 or_stmt        ::= words "/" or_stmt | words ;
 words          ::= word+ ;
 word           ::= icon_with_text | icon | char ;
-icon_with_text ::= icon icon_text ;
+icon_with_text ::= icon "!"? icon_text ;
 icon_text      ::= "{" words "}" | number ;
-char           ::= !(";" | ":" | "→" | "{" | "}" | "/") ;
+char           ::= !(";" | ":" | ">" | "{" | "}" | "/") ;
 number         ::= "0" | "1"->"9" "0"->"9"* ;
 `.trim();
 
@@ -73,11 +73,11 @@ export class Parser {
         }
         return $line;
       }
-      case 'coron_stmt': {
+      case 'colon_stmt': {
         if (syntax.value.length === 1) {
           return this.build(syntax.value[0] as SyntaxNode);
         }
-        const $stmt = $("<div class='coron-stmt'>");
+        const $stmt = $("<div class='colon-stmt'>");
         $stmt.append(this.build(syntax.value[0] as SyntaxNode));
         $stmt.append(this.literals.$img("COLON"));
         $stmt.append(this.build(syntax.value[2] as SyntaxNode));
@@ -89,7 +89,7 @@ export class Parser {
         }
         const $stmt = $("<div class='arrow-stmt'>");
         $stmt.append(this.build(syntax.value[0] as SyntaxNode));
-        $stmt.append(this.literals.$img("ARROW"));
+        $stmt.append(this.literals.$img("→"));
         $stmt.append(this.build(syntax.value[2] as SyntaxNode));
         return $stmt;
       }
@@ -118,17 +118,23 @@ export class Parser {
       case 'word': {
         return this.build(syntax.value[0] as SyntaxNode);
       }
+      // icon_with_text ::= icon "!"? icon_text ;
       case 'icon_with_text': {
-        const $icon = $("<div class='icon-with-text'></div>");
-        $icon.append(this.build(syntax.value[0] as SyntaxNode));
-        $icon.append(this.build(syntax.value[1] as SyntaxNode).addClass("icon-text"));
+        let [icon, is_large, icon_text] = syntax.value as [SyntaxNode, SyntaxNode, SyntaxNode];
+        let className = "";
+        if (is_large.value === "!") {
+          className = "large";
+        }
+        const $icon = $(`<div class='icon-with-text ${className}'></div>`);
+        $icon.append(this.build(icon));
+        $icon.append(this.build(icon_text).addClass("icon-text"));
         return $icon;
       }
       case 'icon_text': {
         if (syntax.value.length === 1) {
           return this.build(syntax.value[0] as SyntaxNode);
         }
-        return this.build(syntax.value[1] as SyntaxNode).addClass("large");
+        return this.build(syntax.value[1] as SyntaxNode);
       }
       case 'char': {
         return this.build(syntax.value[0] as SyntaxNode);

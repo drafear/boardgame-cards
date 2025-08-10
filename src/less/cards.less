@@ -1,23 +1,52 @@
 @charset "UTF-8";
 
+@font-face {
+  font-family: "DotGothic16";
+  src: url("DotGothic16-Regular.ttf");
+}
+
+@font-face {
+  font-family: "DelaGothicOne";
+  src: url("DelaGothicOne-Regular.ttf");
+}
+
+@font-face {
+  font-family: "ReggaeOne";
+  src: url("ReggaeOne-Regular.ttf");
+}
+
 * {
+  box-sizing: border-box;
+  font-family: "DotGothic16";
+  -webkit-print-color-adjust: exact;
   box-sizing: border-box;
 }
 
 .page {
   display: flex;
-  flex-wrap: wrap;
-  width: 100%;
+  flex-direction: column;
+
+  width: calc(63mm * 3);
+  height: calc(88mm * 3);
 
   .page-row {
     display: flex;
     flex-wrap: nowrap;
+    height: 88mm;
   }
+}
+
+.page+.page {
+  break-before: always;
+}
+
+.page * {
+  break-inside: avoid;
 }
 
 .card {
   position: relative;
-  border: 1px solid black;
+  border: 1px solid #eee;
 
   .entry {
     position: absolute;
@@ -30,23 +59,29 @@
   .icon-with-text {
     position: relative;
 
-    > .icon-text {
-      position: absolute;
-      right: -0.4em;
-      bottom: -0.4em;
-      font-size: 70%;
-      margin-right: 2mm;
+    &:not(.large) {
+      margin-right: 0.5em;
+
+      > .icon-text {
+        position: absolute;
+        left: 1.4em;
+        bottom: -0.2em;
+        font-size: 50%;
+        flex-wrap: nowrap;
+      }
     }
 
-    &:has(.icon-text.large) {
+    &.large {
       > .icon {
         height: 3em;
       }
       > .icon-text {
+        position: absolute;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
+        font-size: 80%;
         justify-content: center;
       }
     }
@@ -71,5 +106,11 @@
 
   div {
     display: flex;
+    flex-wrap: wrap;
+
+    &.colon-stmt,
+    &.arrow-stmt {
+      flex-wrap: nowrap;
+    }
   }
 }

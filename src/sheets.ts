@@ -70,12 +70,19 @@ async function getCards(sheet: Sheet): Promise<Card[]> {
   const data = await fetchSheet(sheet, "latest");
   const header = data[0];
   const cards = [];
+  let num = 1;
   for (const line of data.slice(1)) {
     const entries: { [name: string]: string } = {};
     for (let i = 0; i < header.length; ++i) {
+      if (header[i] === "num") {
+        num = Number(line[i] ?? 1);
+        continue;
+      }
       entries[header[i]] = line[i] ?? "";
     }
-    cards.push(new Card(entries));
+    for (let i = 0; i < num; ++i) {
+      cards.push(new Card(entries));
+    }
   }
   return cards;
 }
